@@ -1,16 +1,15 @@
+// #tsconfig.json
 {
 	"compilerOptions": {
-		"target": "ES2018",
-		"module": "commonjs",
-		"declaration": true,
-		"declarationMap": true,
-		"sourceMap": true,
 		"outDir": "./dist",
+		"allowJs": true,
+		"target": "es2018",
+		"module": "CommonJS",
 		"strict": true,
-		"rootDirs": ["./src", "./scripts", "./test"],
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"rootDirs": ["./src", "./scripts", "./test"]
+		// "types": ["chai", "mocha", "node"]
 	},
-	"exclude": ["dist", "node_modules"],
-	"include": ["./test", "./src", "./scripts"],
+	"include": ["./src/**/*", "./scripts", "./test", "./test/**/*"],
 	"files": ["./hardhat.config.ts"]
 }
