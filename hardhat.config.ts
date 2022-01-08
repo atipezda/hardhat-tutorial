@@ -5,6 +5,8 @@
 import '@nomiclabs/hardhat-waffle';
 import '@nomiclabs/hardhat-ethers';
 import "@typechain/hardhat";
+import "@openzeppelin/hardhat-upgrades"
+
 require('dotenv').config()
 
 const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY
@@ -12,7 +14,7 @@ const ROPSTEN_PRIVATE_KEY = process.env.ROPSTEN_PRIVATE_KEY
 
 
 module.exports = {
-    solidity: "0.7.3",
+    solidity: "0.8.11",
     networks: {
         ropsten: {
             url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
