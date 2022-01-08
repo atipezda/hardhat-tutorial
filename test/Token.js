@@ -1,8 +1,8 @@
 const {expect} = require("chai");
 const {ethers} = require("hardhat");
 
-describe("Token contract", function () {
-	it("Deployment should assign all tokens to owner", async function () {
+describe("Token contract", () => {
+	it("Deployment should assign all tokens to owner", async () => {
 		const [owner] = await ethers.getSigners();
 
 		const Token = await ethers.getContractFactory("Token");
@@ -14,7 +14,7 @@ describe("Token contract", function () {
 
 	})
 
-	it("Should transfer tokens between accounts", async function () {
+	it("Should transfer tokens between accounts", async () => {
 		const TRANSACTION_AMOUNT = 50;
 
 		const [owner, user1] = await ethers.getSigners();
