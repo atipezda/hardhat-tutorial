@@ -1,7 +1,10 @@
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
-require("@nomiclabs/hardhat-waffle");
+
+import '@nomiclabs/hardhat-waffle';
+import '@nomiclabs/hardhat-ethers';
+import "@typechain/hardhat";
 module.exports = {
   solidity: "0.7.3",
 };
