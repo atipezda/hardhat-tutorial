@@ -50,17 +50,21 @@ describe("FFTToken Token contract", () => {
     describe("Mint", () => {
         it("Owner should be able to mint", async () => {
             const TOKENS_TO_MINT = 10;
+
             const ownerBalance = await hardhatToken.balanceOf(owner.address);
             hardhatToken.createTokens(TOKENS_TO_MINT);
             expect(await hardhatToken.balanceOf(owner.address)).to.equal(Number(ownerBalance) + TOKENS_TO_MINT);
+            expect(await hardhatToken.totalSupply()).to.equal(Number(ownerBalance) + TOKENS_TO_MINT);
         })
 
         it("Should fail to mint from non-owner address", async () => {
             const TOKENS_TO_MINT = 10;
 
+            const initialTokenSupply = await hardhatToken.totalSupply();
             const addr1InitialBalance = await hardhatToken.balanceOf(addr1.address);
             await expect(hardhatToken.connect(addr1).createTokens(TOKENS_TO_MINT)).to.be.revertedWith("Ownable: caller is not the owner")
             expect(await hardhatToken.balanceOf(addr1.address)).to.equal(addr1InitialBalance);
+            expect(await hardhatToken.totalSupply()).to.equal(initialTokenSupply);
         })
     })
 })
