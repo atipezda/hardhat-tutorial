@@ -3,7 +3,7 @@ import {expect} from "chai";
 import {Contract} from "ethers";
 import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/signers";
 
-describe("FFTToken Token contract", () => {
+describe.only("FFTToken Token contract", () => {
 
     let Token;
     let hardhatToken: Contract;

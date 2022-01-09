@@ -29,13 +29,13 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC20__factory>;
     getContractFactory(
-      name: "Token",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Token__factory>;
-    getContractFactory(
       name: "FFToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.FFToken__factory>;
+    getContractFactory(
+      name: "VestingContract",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VestingContract__factory>;
 
     getContractAt(
       name: "Ownable",
@@ -58,15 +58,15 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC20>;
     getContractAt(
-      name: "Token",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Token>;
-    getContractAt(
       name: "FFToken",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.FFToken>;
+    getContractAt(
+      name: "VestingContract",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VestingContract>;
 
     // default types
     getContractFactory(
