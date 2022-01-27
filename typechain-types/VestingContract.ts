@@ -108,11 +108,7 @@ export interface VestingContract extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<
-      [string, BigNumber, BigNumber] & {
-        addr: string;
-        vestEnd: BigNumber;
-        vested: BigNumber;
-      }
+      [BigNumber, BigNumber] & { vestEnd: BigNumber; vested: BigNumber }
     >;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
@@ -139,11 +135,7 @@ export interface VestingContract extends BaseContract {
     arg0: string,
     overrides?: CallOverrides
   ): Promise<
-    [string, BigNumber, BigNumber] & {
-      addr: string;
-      vestEnd: BigNumber;
-      vested: BigNumber;
-    }
+    [BigNumber, BigNumber] & { vestEnd: BigNumber; vested: BigNumber }
   >;
 
   owner(overrides?: CallOverrides): Promise<string>;
@@ -170,11 +162,7 @@ export interface VestingContract extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<
-      [string, BigNumber, BigNumber] & {
-        addr: string;
-        vestEnd: BigNumber;
-        vested: BigNumber;
-      }
+      [BigNumber, BigNumber] & { vestEnd: BigNumber; vested: BigNumber }
     >;
 
     owner(overrides?: CallOverrides): Promise<string>;

@@ -2,9 +2,6 @@ import {ethers} from "hardhat";
 import {expect} from "chai";
 import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/signers";
 import {VestingContract, VestingContract__factory} from "../../typechain-types";
-import TimeTraveller from "../_helpers/TimeTraveller";
-import {BigNumber} from "ethers";
-
 
 describe.only("Vesting contract", () => {
 
@@ -55,13 +52,12 @@ describe.only("Vesting contract", () => {
             expect(vestingEnd).to.equal(monthFromTimeStamp);
         })
 
-
-        it("Should fail register same beneficiary", async ()=>{
+        it("Should fail register same beneficiary", async () => {
             await expect(vestingContract.vest(addr1.address, 10000)).to.be.revertedWith("Beneficiary already registered");
         })
 
-        it("Should fail if used by no-owner", async ()=>{
-            await expect(vestingContract.connect(addr1).vest(addr2.address,1000)).to.be.revertedWith("Ownable: caller is not the owner");
+        it("Should fail if called by no-owner", async () => {
+            await expect(vestingContract.connect(addr1).vest(addr2.address, 1000)).to.be.revertedWith("Ownable: caller is not the owner");
         });
 
     })
