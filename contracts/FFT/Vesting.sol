@@ -2,25 +2,21 @@ pragma solidity ^0.8.0;
 
 contract VestingContract {
 
+    uint256 public testValue = 0;
+
     struct beneficiary {
         address addr;
-        string name;
+        uint256 vestEnd;
+        uint256 vested;
     }
 
-    mapping(address => beneficiary) beneficiaries;
+    mapping(address => beneficiary) public beneficiaries;
 
-    function registerBeneficiary(address addr, string memory name) public {
+    function vest(address addr, uint256 amount) public {
         beneficiary storage newBeneficiary = beneficiaries[addr];
         newBeneficiary.addr = addr;
-        newBeneficiary.name = name;
+        newBeneficiary.vested = amount;
+        newBeneficiary.vestEnd = block.timestamp + 30 days;
     }
 
-    function getBeneficiary(address addr) public view returns (string memory){
-        beneficiary storage ben = beneficiaries[addr];
-        return (ben.name);
-    }
-
-    function getBeneficiariesCount() public view returns (uint){
-        return 1;
-    }
 }

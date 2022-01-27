@@ -4,6 +4,7 @@
 import {
   BaseContract,
   BigNumber,
+  BigNumberish,
   BytesLike,
   CallOverrides,
   ContractTransaction,
@@ -18,36 +19,27 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface VestingContractInterface extends utils.Interface {
   functions: {
-    "getBeneficiariesCount()": FunctionFragment;
-    "getBeneficiary(address)": FunctionFragment;
-    "registerBeneficiary(address,string)": FunctionFragment;
+    "beneficiaries(address)": FunctionFragment;
+    "testValue()": FunctionFragment;
+    "vest(address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "getBeneficiariesCount",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getBeneficiary",
+    functionFragment: "beneficiaries",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "testValue", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "registerBeneficiary",
-    values: [string, string]
+    functionFragment: "vest",
+    values: [string, BigNumberish]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "getBeneficiariesCount",
+    functionFragment: "beneficiaries",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "getBeneficiary",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "registerBeneficiary",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "testValue", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "vest", data: BytesLike): Result;
 
   events: {};
 }
@@ -79,35 +71,62 @@ export interface VestingContract extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    getBeneficiariesCount(overrides?: CallOverrides): Promise<[BigNumber]>;
+    beneficiaries(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [string, BigNumber, BigNumber] & {
+        addr: string;
+        vestEnd: BigNumber;
+        vested: BigNumber;
+      }
+    >;
 
-    getBeneficiary(addr: string, overrides?: CallOverrides): Promise<[string]>;
+    testValue(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    registerBeneficiary(
+    vest(
       addr: string,
-      name: string,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
-  getBeneficiariesCount(overrides?: CallOverrides): Promise<BigNumber>;
+  beneficiaries(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<
+    [string, BigNumber, BigNumber] & {
+      addr: string;
+      vestEnd: BigNumber;
+      vested: BigNumber;
+    }
+  >;
 
-  getBeneficiary(addr: string, overrides?: CallOverrides): Promise<string>;
+  testValue(overrides?: CallOverrides): Promise<BigNumber>;
 
-  registerBeneficiary(
+  vest(
     addr: string,
-    name: string,
+    amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    getBeneficiariesCount(overrides?: CallOverrides): Promise<BigNumber>;
+    beneficiaries(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [string, BigNumber, BigNumber] & {
+        addr: string;
+        vestEnd: BigNumber;
+        vested: BigNumber;
+      }
+    >;
 
-    getBeneficiary(addr: string, overrides?: CallOverrides): Promise<string>;
+    testValue(overrides?: CallOverrides): Promise<BigNumber>;
 
-    registerBeneficiary(
+    vest(
       addr: string,
-      name: string,
+      amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -115,30 +134,28 @@ export interface VestingContract extends BaseContract {
   filters: {};
 
   estimateGas: {
-    getBeneficiariesCount(overrides?: CallOverrides): Promise<BigNumber>;
+    beneficiaries(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    getBeneficiary(addr: string, overrides?: CallOverrides): Promise<BigNumber>;
+    testValue(overrides?: CallOverrides): Promise<BigNumber>;
 
-    registerBeneficiary(
+    vest(
       addr: string,
-      name: string,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    getBeneficiariesCount(
+    beneficiaries(
+      arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getBeneficiary(
-      addr: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    testValue(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    registerBeneficiary(
+    vest(
       addr: string,
-      name: string,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

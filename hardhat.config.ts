@@ -6,6 +6,7 @@ import '@nomiclabs/hardhat-waffle';
 import '@nomiclabs/hardhat-ethers';
 import "@typechain/hardhat";
 import "@openzeppelin/hardhat-upgrades"
+import "hardhat-gas-reporter"
 
 require('dotenv').config()
 
@@ -20,5 +21,12 @@ module.exports = {
             url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
             accounts: [`${ROPSTEN_PRIVATE_KEY}`]
         }
-    }
+    },
+    gasReporter: {
+        currency: "USD",
+        enabled: false,
+        excludeContracts: [],
+        src: "./contracts",
+        noColors: true
+    },
 };

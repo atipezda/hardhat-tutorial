@@ -29,6 +29,7 @@
     "@openzeppelin/contracts": "^4.4.1",
     "@typechain/ethers-v5": "^8.0.5",
     "dotenv": "^10.0.0",
+    "hardhat-gas-reporter": "^1.0.7",
     "mocha": "^9.1.3"
   }
 }

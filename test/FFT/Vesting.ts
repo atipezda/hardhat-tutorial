@@ -2,6 +2,8 @@ import {ethers} from "hardhat";
 import {expect} from "chai";
 import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/signers";
 import {VestingContract, VestingContract__factory} from "../../typechain-types";
+import TimeTraveller from "../_helpers/TimeTraveller";
+import {BigNumber} from "ethers";
 
 
 describe.only("Vesting contract", () => {
@@ -10,10 +12,11 @@ describe.only("Vesting contract", () => {
     let vestingContract: VestingContract;
     let owner: SignerWithAddress
     let addr1: SignerWithAddress
+    let addr2: SignerWithAddress
 
     beforeEach(async () => {
         Token = <VestingContract__factory>await ethers.getContractFactory("VestingContract");
-        [owner, addr1] = await ethers.getSigners();
+        [owner, addr1, addr2] = await ethers.getSigners();
         vestingContract = await Token.deploy();
     });
 
@@ -24,15 +27,35 @@ describe.only("Vesting contract", () => {
     })
 
     describe("Vesting", () => {
-        it("should register and store new beneficiary name", async () => {
-            const TEST_NAME = "Fred Flintstone";
+        const VESTED_COINS = 100;
 
-            await vestingContract.registerBeneficiary(addr1.address, TEST_NAME)
-            const name = await vestingContract.getBeneficiary(addr1.address);
+        let ben1: Awaited<ReturnType<typeof vestingContract.beneficiaries>>
 
-            expect(name).to.equal(TEST_NAME);
+        beforeEach(async () => {
+            await vestingContract.vest(addr1.address, VESTED_COINS);
+            ben1 = await vestingContract.beneficiaries(addr1.address)
+        });
+
+
+        it("should register and store new beneficiary", async () => {
+            expect(ben1.addr).to.not.equal(ethers.constants.AddressZero);
         })
-    })
 
+        it("Should save vesting amount", async () => {
+            expect(ben1.vested).to.equal(VESTED_COINS);
+        })
+
+        it("Should save vesting end date a month from now", async () => {
+            const monthInSeconds = 60 * 60 * 24 * 30;
+
+            const vestingEnd = ben1.vestEnd;
+            const timeStamp = (await ethers.provider.getBlock("latest")).timestamp;
+            const monthFromTimeStamp = timeStamp + monthInSeconds;
+
+            expect(vestingEnd).to.equal(monthFromTimeStamp);
+        })
+
+
+    })
 })
 
