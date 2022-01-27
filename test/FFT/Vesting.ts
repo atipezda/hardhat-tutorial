@@ -60,6 +60,10 @@ describe.only("Vesting contract", () => {
             await expect(vestingContract.vest(addr1.address, 10000)).to.be.revertedWith("Beneficiary already registered");
         })
 
+        it("Should fail if used by no-owner", async ()=>{
+            await expect(vestingContract.connect(addr1).vest(addr2.address,1000)).to.be.revertedWith("Ownable: caller is not the owner");
+        });
+
     })
 })
 
