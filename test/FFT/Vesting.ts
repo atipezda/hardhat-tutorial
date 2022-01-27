@@ -56,6 +56,10 @@ describe.only("Vesting contract", () => {
         })
 
 
+        it("Should fail register same beneficiary", async ()=>{
+            await expect(vestingContract.vest(addr1.address, 10000)).to.be.revertedWith("Beneficiary already registered");
+        })
+
     })
 })
 

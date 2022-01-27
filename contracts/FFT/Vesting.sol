@@ -13,6 +13,8 @@ contract VestingContract {
     mapping(address => beneficiary) public beneficiaries;
 
     function vest(address addr, uint256 amount) public {
+        require(beneficiaries[addr].vested == 0, "Beneficiary already registered");
+
         beneficiary storage newBeneficiary = beneficiaries[addr];
         newBeneficiary.addr = addr;
         newBeneficiary.vested = amount;
