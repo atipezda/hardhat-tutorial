@@ -3,9 +3,12 @@ import {expect} from "chai";
 import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/signers";
 import {FFToken, FFToken__factory, VestingContract, VestingContract__factory} from "../../typechain-types";
 import TimeTraveller from "../_helpers/TimeTraveller";
+import {Calc} from "../_helpers/Calc";
+
 import {BigNumber} from "ethers";
 
 const {TIME} = TimeTraveller
+const {roundDown, roundUp} = Calc
 
 describe.only("Vesting contract", () => {
 
@@ -92,7 +95,11 @@ describe.only("Vesting contract", () => {
     })
 
     describe("Claim", () => {
-        const VESTED_COINS = 30;
+        const VESTED_COINS = 77;
+
+        const vestDurationDays = 30;
+        const tokensByDay = VESTED_COINS / vestDurationDays;
+
 
         let ben1: Awaited<ReturnType<typeof vestingContract.beneficiaries>>
         let ben1initBalance = 0;
@@ -110,25 +117,53 @@ describe.only("Vesting contract", () => {
             expect(await token.balanceOf(addr1.address)).to.equal(0);
         })
 
-        it("allows to claim 1 of 30 tokens after 1 day", async () => {
-            await timeTraveller.increaseTime(TIME.DAY);
-            await vestingContract.claim(1);
+        it("allows to claim due part of tokens", async () => {
+            const daysFromStart = 2;
+
+            await timeTraveller.increaseTime(daysFromStart * TIME.DAY);
+            const toClaim = roundDown(daysFromStart * tokensByDay);
+            await vestingContract.claim(toClaim)
             const balance = await token.balanceOf(addr1.address);
-            expect(balance).to.equal(1);
+
+            expect(balance).to.equal(toClaim);
         });
 
-        it("Should subtract partial-claim coins", async () => {
-            const daysFromStart = 5 * TIME.DAY;
+        it("Should allow partial-claim coins", async () => {
+            const daysFromStart = 5;
             const partialClaim = 2;
             const fullClaim = 5;
 
-            await timeTraveller.increaseTime(daysFromStart);
+            await timeTraveller.increaseTime(daysFromStart * TIME.DAY);
             await vestingContract.claim(partialClaim);
             expect(await token.balanceOf(addr1.address)).to.equal(partialClaim);
 
             await vestingContract.claim(fullClaim - partialClaim);
             expect(await token.balanceOf(addr1.address)).to.equal(fullClaim);
 
+        })
+
+        it("Should release amount proportional to time passed", async () => {
+            const firstClaimDays = 4;
+            const firstClaimMax = roundDown(firstClaimDays * VESTED_COINS / vestDurationDays);
+            const nextClaimAfterDays = 4;
+            const secondClaimMax = roundDown((firstClaimDays + nextClaimAfterDays) * VESTED_COINS / vestDurationDays)
+            const availableToSecondClaim = secondClaimMax - firstClaimMax;
+
+            await timeTraveller.increaseTime(firstClaimDays * TIME.DAY);
+            await vestingContract.claim(firstClaimMax);
+            expect(await token.balanceOf(addr1.address)).to.equal(firstClaimMax);
+
+            await timeTraveller.increaseTime(nextClaimAfterDays * TIME.DAY);
+            await vestingContract.claim(availableToSecondClaim);
+            expect(await token.balanceOf(addr1.address)).to.equal(firstClaimMax + availableToSecondClaim);
+        })
+
+
+        it("should release all tokens at the end of vest", async () => {
+            const daysFromStart = 30;
+            await timeTraveller.increaseTime(daysFromStart * TIME.DAY);
+            await vestingContract.claim(VESTED_COINS);
+            expect(await token.balanceOf(addr1.address)).to.equal(VESTED_COINS);
         })
 
     });

@@ -2,10 +2,12 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "hardhat/console.sol";
 import "./Token.sol";
 
 contract VestingContract is Ownable {
+    using SafeMath for uint;
 
     uint256 public vestingPeriodDays = 30;
     uint256 totalVested = 0;
@@ -39,8 +41,14 @@ contract VestingContract is Ownable {
         beneficiary storage beneficiary = beneficiaries[msg.sender];
 
         uint256 daysFromStart = (block.timestamp - beneficiary.vestStart) / 86400;
-        uint256 tokensByDay = beneficiary.vested / vestingPeriodDays;
-        uint256 availableToClaim = tokensByDay * daysFromStart - beneficiary.claimed;
+        console.log("Days From Start %s", daysFromStart);
+        uint256 availableToClaim = (beneficiary.vested * 10000 / vestingPeriodDays * 10000 * daysFromStart - beneficiary.claimed * 10000) / 100000000;
+
+        if (daysFromStart == vestingPeriodDays) {
+            availableToClaim = beneficiary.vested - beneficiary.claimed;
+        }
+
+        console.log("Available to claim: %s", availableToClaim);
 
         require(amount <= availableToClaim, "Not enough coins to claim");
         token.transfer(msg.sender, amount);
