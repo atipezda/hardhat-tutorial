@@ -128,6 +128,21 @@ describe.only("Vesting contract", () => {
             expect(balance).to.equal(toClaim);
         });
 
+        it("Should subtract already claimed coins", async () => {
+            const daysFromStart = 2;
+
+            await timeTraveller.increaseTime(daysFromStart * TIME.DAY);
+            const toClaim = roundDown(daysFromStart * tokensByDay);
+            await vestingContract.claim(toClaim)
+            const balance = await token.balanceOf(addr1.address);
+
+            expect(balance).to.equal(toClaim);
+            await expect(vestingContract.claim(toClaim)).to.be.revertedWith("Not enough coins to claim");
+
+            const newBalance = await token.balanceOf(addr1.address);
+            expect(newBalance).to.equal(balance);
+        })
+
         it("Should allow partial-claim coins", async () => {
             const daysFromStart = 5;
             const partialClaim = 2;
@@ -158,12 +173,20 @@ describe.only("Vesting contract", () => {
             expect(await token.balanceOf(addr1.address)).to.equal(firstClaimMax + availableToSecondClaim);
         })
 
-
         it("should release all tokens at the end of vest", async () => {
             const daysFromStart = 30;
             await timeTraveller.increaseTime(daysFromStart * TIME.DAY);
             await vestingContract.claim(VESTED_COINS);
             expect(await token.balanceOf(addr1.address)).to.equal(VESTED_COINS);
+        })
+
+        it("should release only total vested coins, no more", async () => {
+            const daysFromStart = 600;
+            await timeTraveller.increaseTime(daysFromStart * TIME.DAY);
+            const toClaim = VESTED_COINS + 1;
+
+            await expect(vestingContract.claim(toClaim)).to.be.revertedWith("Not enough coins to claim");
+            expect(await token.balanceOf(addr1.address)).to.equal(ben1initBalance);
         })
 
     });

@@ -41,16 +41,13 @@ contract VestingContract is Ownable {
         beneficiary storage beneficiary = beneficiaries[msg.sender];
 
         uint256 daysFromStart = (block.timestamp - beneficiary.vestStart) / 86400;
-        console.log("Days From Start %s", daysFromStart);
-        uint256 availableToClaim = (beneficiary.vested * 10000 / vestingPeriodDays * 10000 * daysFromStart - beneficiary.claimed * 10000) / 100000000;
-
-        if (daysFromStart == vestingPeriodDays) {
+        uint256 availableToClaim = (beneficiary.vested * 10000 / vestingPeriodDays * 10000 * daysFromStart - beneficiary.claimed * 100000000) / 100000000;
+        if (daysFromStart >= vestingPeriodDays) {
             availableToClaim = beneficiary.vested - beneficiary.claimed;
         }
-
-        console.log("Available to claim: %s", availableToClaim);
-
         require(amount <= availableToClaim, "Not enough coins to claim");
+
+        beneficiary.claimed = beneficiary.claimed + amount;
         token.transfer(msg.sender, amount);
     }
 
