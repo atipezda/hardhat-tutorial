@@ -39,6 +39,8 @@ contract VestingContract is Ownable {
         beneficiary storage beneficiary = beneficiaries[msg.sender];
 
         uint256 daysFromStart = (block.timestamp - beneficiary.vestStart) / 86400;
+
+        // used * 10000 here because of decimals missing in solidity (now we have more accurate token per day calculation)
         uint256 availableToClaim = (beneficiary.vested * 10000 / vestingPeriodDays * 10000 * daysFromStart - beneficiary.claimed * 100000000) / 100000000;
         if (daysFromStart >= vestingPeriodDays) {
             availableToClaim = beneficiary.vested - beneficiary.claimed;
