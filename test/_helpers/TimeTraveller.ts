@@ -4,6 +4,13 @@ class TimeTraveller {
     //eslint-disable-next-line @typescript-eslint/no-explicit-any
     private snapshotID: any;
     private ethereum: JsonRpcProvider;
+    public static TIME = {
+        SEC: 1,
+        MIN: 60,
+        HOUR: 3600,
+        DAY: 86400,
+        MONTH: 2592000 //30 days
+    }
 
     constructor(ethereum: JsonRpcProvider) {
         this.ethereum = ethereum;
@@ -29,8 +36,8 @@ class TimeTraveller {
         }
     }
 
-    public async increaseTime(amount: number) {
-        await this.ethereum.send("evm_increaseTime", [amount]);
+    public async increaseTime(secs: number) {
+        await this.ethereum.send("evm_increaseTime", [secs]);
     }
 
     public async setNextBlockTimestamp(timestamp: number) {

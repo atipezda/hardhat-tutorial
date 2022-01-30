@@ -20,23 +20,26 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface VestingContractInterface extends utils.Interface {
   functions: {
     "beneficiaries(address)": FunctionFragment;
+    "claim(uint256)": FunctionFragment;
     "owner()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "testValue()": FunctionFragment;
+    "token()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "vest(address,uint256)": FunctionFragment;
+    "vestingPeriodDays()": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "beneficiaries",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "claim", values: [BigNumberish]): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "testValue", values?: undefined): string;
+  encodeFunctionData(functionFragment: "token", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [string]
@@ -45,22 +48,31 @@ export interface VestingContractInterface extends utils.Interface {
     functionFragment: "vest",
     values: [string, BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "vestingPeriodDays",
+    values?: undefined
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "beneficiaries",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "testValue", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "token", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "vest", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "vestingPeriodDays",
+    data: BytesLike
+  ): Result;
 
   events: {
     "OwnershipTransferred(address,address)": EventFragment;
@@ -108,8 +120,17 @@ export interface VestingContract extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber] & { vestEnd: BigNumber; vested: BigNumber }
+      [BigNumber, BigNumber, BigNumber] & {
+        vestStart: BigNumber;
+        claimed: BigNumber;
+        vested: BigNumber;
+      }
     >;
+
+    claim(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
@@ -117,7 +138,7 @@ export interface VestingContract extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    testValue(overrides?: CallOverrides): Promise<[BigNumber]>;
+    token(overrides?: CallOverrides): Promise<[string]>;
 
     transferOwnership(
       newOwner: string,
@@ -129,14 +150,25 @@ export interface VestingContract extends BaseContract {
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    vestingPeriodDays(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
   beneficiaries(
     arg0: string,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber] & { vestEnd: BigNumber; vested: BigNumber }
+    [BigNumber, BigNumber, BigNumber] & {
+      vestStart: BigNumber;
+      claimed: BigNumber;
+      vested: BigNumber;
+    }
   >;
+
+  claim(
+    amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
@@ -144,7 +176,7 @@ export interface VestingContract extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  testValue(overrides?: CallOverrides): Promise<BigNumber>;
+  token(overrides?: CallOverrides): Promise<string>;
 
   transferOwnership(
     newOwner: string,
@@ -157,19 +189,27 @@ export interface VestingContract extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  vestingPeriodDays(overrides?: CallOverrides): Promise<BigNumber>;
+
   callStatic: {
     beneficiaries(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber] & { vestEnd: BigNumber; vested: BigNumber }
+      [BigNumber, BigNumber, BigNumber] & {
+        vestStart: BigNumber;
+        claimed: BigNumber;
+        vested: BigNumber;
+      }
     >;
+
+    claim(amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
-    testValue(overrides?: CallOverrides): Promise<BigNumber>;
+    token(overrides?: CallOverrides): Promise<string>;
 
     transferOwnership(
       newOwner: string,
@@ -181,6 +221,8 @@ export interface VestingContract extends BaseContract {
       amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    vestingPeriodDays(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   filters: {
@@ -197,13 +239,18 @@ export interface VestingContract extends BaseContract {
   estimateGas: {
     beneficiaries(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
+    claim(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    testValue(overrides?: CallOverrides): Promise<BigNumber>;
+    token(overrides?: CallOverrides): Promise<BigNumber>;
 
     transferOwnership(
       newOwner: string,
@@ -215,6 +262,8 @@ export interface VestingContract extends BaseContract {
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    vestingPeriodDays(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -223,13 +272,18 @@ export interface VestingContract extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    claim(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    testValue(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    token(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     transferOwnership(
       newOwner: string,
@@ -241,5 +295,7 @@ export interface VestingContract extends BaseContract {
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    vestingPeriodDays(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }
